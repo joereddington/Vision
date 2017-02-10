@@ -19,3 +19,6 @@ data.extend(get_issues('equalitytime/home'))
 data = sorted(data, key=lambda k: k['title'])
 for i in data:
     print i["title"]
+
+for i in data:
+    print i["comments_url"]
