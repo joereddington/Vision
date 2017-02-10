@@ -34,14 +34,22 @@ def slugify(value):
     return value
 
 
-target = 'joereddington/Vision'
-data = get_issues(target)
-data.extend(get_issues('equalitytime/whitewaterwriters'))
-data.extend(get_issues('equalitytime/home'))
 
-data = sorted(data, key=lambda k: k['title'])
-for issue in data:
-    print issue["title"]
-    download_comment_to_file(issue["title"],issue["comments_url"])
+def get_issues_from_list():
+    target = 'joereddington/Vision'
+    data = get_issues(target)
+    data.extend(get_issues('equalitytime/whitewaterwriters'))
+    data.extend(get_issues('equalitytime/home'))
+
+    data = sorted(data, key=lambda k: k['title'])
+    for issue in data:
+        print issue["title"]
+        download_comment_to_file(issue["title"],issue["comments_url"])
 
 #download_comment_to_file("test","https://api.github.com/repos/joereddington/Vision/issues/1/comments")
+
+data=get_json_from_url("https://api.github.com/users/joereddington/repos")
+data.extend(get_json_from_url("https://api.github.com/users/equalitytime/repos"))
+for repo in data:
+    if (repo['has_issues']):
+        print repo['url']
