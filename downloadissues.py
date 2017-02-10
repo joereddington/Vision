@@ -17,6 +17,7 @@ def get_issues(target):
 def download_comment_to_file(title,url):
     data =get_json_from_url(url)
     with open("issues/"+slugify(unicode(title))+'.md', 'wb') as target_file:
+        target_file.write("title: "+title+"\n")
         for comment in data:
              target_file.write(comment['body'])
 
