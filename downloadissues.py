@@ -16,7 +16,7 @@ def get_issues(target):
 
 def download_comment_to_file(title,url):
     data =get_json_from_url(url)
-    with open(slugify(unicode(title))+'.md', 'wb') as target_file:
+    with open("issues/"+slugify(unicode(title))+'.md', 'wb') as target_file:
         for comment in data:
              target_file.write(comment['body'])
 
@@ -39,11 +39,8 @@ data.extend(get_issues('equalitytime/whitewaterwriters'))
 data.extend(get_issues('equalitytime/home'))
 
 data = sorted(data, key=lambda k: k['title'])
-for i in data:
-    print i["title"]
-comments_list=[]
-for i in data:
-    comments_list.extend( i["comments_url"])
+for issue in data:
+    print issue["title"]
+    download_comment_to_file(issue["title"],issue["comments_url"])
 
-
-download_comment_to_file("test","https://api.github.com/repos/joereddington/Vision/issues/1/comments")
+#download_comment_to_file("test","https://api.github.com/repos/joereddington/Vision/issues/1/comments")
