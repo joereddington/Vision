@@ -1,55 +1,59 @@
-import urllib, json
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+import urllib
+import json
 from urllib2 import urlopen, Request
 import re
 
+MY_REPO_ROOT="https://api.github.com/users/joereddington"
+EQT_REPO_ROOT="https://api.github.com/users/equalitytime"
+
 def get_json_from_url(url):
     config = json.loads(open('config.json').read())
-    token = config["token"]
-    request=Request(url)
+    token = config['token']
+    request = Request(url)
     request.add_header('Authorization', 'token %s' % token)
     response = urlopen(request)
     return json.loads(response.read())
 
-def get_issues(target):
-    url = 'https://api.github.com/repos/%s/issues' % target
-    return get_json_from_url(url)
 
-def download_comment_to_file(title,url):
-    data =get_json_from_url(url)
-    with open("issues/"+slugify(unicode(title))+'.md', 'wb') as target_file:
-        target_file.write("title: "+title+"\n")
+def download_comment_to_file(title, url):
+    data = get_json_from_url(url)
+    with open('issues/' + slugify(unicode(title)) + '.md', 'wb') as \
+        target_file:
+        target_file.write('title: ' + title + '\n')
         for comment in data:
-             target_file.write(comment['body'])
+            target_file.write(comment['body'])
+            target_file.write('\n')  # Otherwise comments run together
 
-#via http://stackoverflow.com/a/295466/170243 and Django
+
+# via http://stackoverflow.com/a/295466/170243 and Django
 def slugify(value):
     """
     Normalizes string, converts to lowercase, removes non-alpha characters,
     and converts spaces to hyphens.
     """
+
     import unicodedata
-    value = unicodedata.normalize('NFKD', value).encode('ascii', 'ignore')
+    value = unicodedata.normalize('NFKD', value).encode('ascii',
+            'ignore')
     value = unicode(re.sub('[^\w\s-]', '', value).strip().lower())
     value = unicode(re.sub('[-\s]+', '-', value))
     return value
 
 
 
-def get_issues_from_list():
-    target = 'joereddington/Vision'
-    data = get_issues(target)
-    data.extend(get_issues('equalitytime/whitewaterwriters'))
-    data.extend(get_issues('equalitytime/home'))
+repos = []
+repos = get_json_from_url(MY_REPO_ROOT+'/repos')
+repos.extend(get_json_from_url(EQT_REPO_ROOT+'/repos'))
+issues = []
+for repo in repos:
+    if repo['has_issues']:
+        issues.extend(get_json_from_url(repo['url'] + '/issues?state=all&filter=all'))
 
-    data = sorted(data, key=lambda k: k['title'])
-    for issue in data:
-        print issue["title"]
-        download_comment_to_file(issue["title"],issue["comments_url"])
+#issues.extend(get_json_from_url('https://api.github.com/repos/equalitytime/whitewaterwriters' + '/issues?state=all&filter=all'))
+issues = sorted(issues, key=lambda k: k['title'])
+for issue in issues:
+    print issue['title']
+    download_comment_to_file(issue['title'], issue['comments_url'])
 
-#download_comment_to_file("test","https://api.github.com/repos/joereddington/Vision/issues/1/comments")
-
-data=get_json_from_url("https://api.github.com/users/joereddington/repos")
-data.extend(get_json_from_url("https://api.github.com/users/equalitytime/repos"))
-for repo in data:
-    if (repo['has_issues']):
-        print repo['url']
