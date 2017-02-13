@@ -44,14 +44,16 @@ def slugify(value):
 
 
 repos = []
-repos = get_json_from_url(MY_REPO_ROOT+'/repos')
-repos.extend(get_json_from_url(EQT_REPO_ROOT+'/repos'))
+#repos = get_json_from_url(MY_REPO_ROOT+'/repos')
+#repos.extend(get_json_from_url(EQT_REPO_ROOT+'/repos'))
+repos.extend(get_json_from_url("https://api.github.com/user/repos"))
 issues = []
 for repo in repos:
+    print repo['full_name']
     if repo['has_issues']:
         issues.extend(get_json_from_url(repo['url'] + '/issues?state=all&filter=all'))
 
-#issues.extend(get_json_from_url('https://api.github.com/repos/equalitytime/whitewaterwriters' + '/issues?state=all&filter=all'))
+issues.extend(get_json_from_url('https://api.github.com/repos/equalitytime/whitewaterwriters' + '/issues?state=all&filter=all'))
 issues = sorted(issues, key=lambda k: k['title'])
 for issue in issues:
     print issue['title']
