@@ -23,7 +23,7 @@ def download_comment_to_file(title, url):
         target_file:
         target_file.write('title: ' + title + '\n')
         for comment in data:
-            target_file.write(comment['body'])
+            target_file.write(comment['body'].encode('utf-8'))
             target_file.write('\n')  # Otherwise comments run together
 
 
@@ -49,13 +49,25 @@ repos = []
 repos.extend(get_json_from_url("https://api.github.com/user/repos"))
 issues = []
 for repo in repos:
-    print repo['full_name']
     if repo['has_issues']:
         issues.extend(get_json_from_url(repo['url'] + '/issues?state=all&filter=all'))
 
 issues.extend(get_json_from_url('https://api.github.com/repos/equalitytime/whitewaterwriters' + '/issues?state=all&filter=all'))
 issues = sorted(issues, key=lambda k: k['title'])
+deadlines=[]
 for issue in issues:
-    print issue['title']
+    if '2017' in issue['title']:
+        deadline={}
+        #then it probably has a real deadline.
+        deadline['date']=issue['title'][:10]
+        deadline['action']=issue['title'][11:]
+        deadline['state']=issue['state']
+        deadline['url']=issue['url']
+        deadlines.append(deadline.copy())
     download_comment_to_file(issue['title'], issue['comments_url'])
+
+
+with open('deadlines.json',"w") as out_file:
+    json.dump(deadlines, out_file)
+
 
