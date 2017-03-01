@@ -1,0 +1,24 @@
+<html>
+<head>
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
+</head>
+<body>
+<script>
+start();
+   function start() {
+       var req = new XMLHttpRequest();
+       req.open("GET", "http://joereddington.com/deadlines.json");
+       req.overrideMimeType("application/json");
+       req.send(null);
+       req.onreadystatechange = function() {
+           if (req.readyState == 4 && req.status == 200) {
+               var obj = JSON.parse(req.responseText);
+	       alert(obj);
+           }
+       };
+       //TODO - needs an error message if the JSON doesn't load
+   }
+</script>
+
+</body>
+

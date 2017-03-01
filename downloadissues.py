@@ -59,6 +59,7 @@ for issue in issues:
     if '2017' in issue['title']:
         deadline={}
         #then it probably has a real deadline.
+        print issue['title']
         deadline['date']=issue['title'][:10]
         deadline['action']=issue['title'][11:]
         deadline['state']=issue['state']
