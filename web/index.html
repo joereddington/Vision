@@ -1,24 +1,37 @@
 <html>
+
 <head>
-<script type="text/javascript" src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
 </head>
+
 <body>
-<script>
-start();
-   function start() {
-       var req = new XMLHttpRequest();
-       req.open("GET", "http://joereddington.com/deadlines.json");
-       req.overrideMimeType("application/json");
-       req.send(null);
-       req.onreadystatechange = function() {
-           if (req.readyState == 4 && req.status == 200) {
-               var obj = JSON.parse(req.responseText);
-	       alert(obj);
-           }
-       };
-       //TODO - needs an error message if the JSON doesn't load
-   }
-</script>
+
+<div id="content"></div>
+    <script>
+        deadlines = []
+        start();
+
+        function start() {
+            var req = new XMLHttpRequest();
+            req.open("GET", "http://joereddington.com/deadlines.json");
+            req.overrideMimeType("application/json");
+            req.send(null);
+            req.onreadystatechange = function() {
+                if (req.readyState == 4 && req.status == 200) {
+                    var obj = JSON.parse(req.responseText);
+                    deadlines = obj
+		    var content="<table>"
+		    var i=0
+                    for (i=0;i<deadlines.length;i++){ 
+			content+="<tr><td>"+deadlines[i].date+ "</td><td>"+deadlines[i].action+"</td></tr>"
+			console.log(deadlines[i])
+                        console.log(deadlines[i].date)
+                        console.log(deadlines[i].action)
+                    }
+		document.getElementById("content").innerHTML=content;
+                }
+            };
+        }
+    </script>
 
 </body>
-
