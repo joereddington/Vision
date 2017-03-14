@@ -4,12 +4,13 @@ import urllib
 import json
 from urllib2 import urlopen, Request
 import re
+import os
 
 MY_REPO_ROOT="https://api.github.com/users/joereddington"
 EQT_REPO_ROOT="https://api.github.com/users/equalitytime"
 
 def get_json_from_url(url):
-    config = json.loads(open('config.json').read())
+    config = json.loads(open('/home/joereddington/flow.joereddington.com/vision/config.json').read())
     token = config['token']
     request = Request(url)
     request.add_header('Authorization', 'token %s' % token)
@@ -19,7 +20,7 @@ def get_json_from_url(url):
 
 def download_comment_to_file(title, url):
     data = get_json_from_url(url)
-    with open('issues/' + slugify(unicode(title)) + '.md', 'wb') as \
+    with open(os.path.dirname(os.path.abspath(__file__))+'/issues/' + slugify(unicode(title)) + '.md', 'wb') as \
         target_file:
         target_file.write('title: ' + title + '\n')
         for comment in data:
