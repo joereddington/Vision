@@ -10,7 +10,7 @@ MY_REPO_ROOT="https://api.github.com/users/joereddington"
 EQT_REPO_ROOT="https://api.github.com/users/equalitytime"
 
 def get_json_from_url(url):
-    config = json.loads(os.path.dirname(os.path.abspath(__file__))+'/config.json')
+    config = json.loads(open(os.path.dirname(os.path.abspath(__file__))+'/config.json').read())
     token = config['token']
     request = Request(url)
     request.add_header('Authorization', 'token %s' % token)
