@@ -42,34 +42,35 @@ def slugify(value):
     value = unicode(re.sub('[-\s]+', '-', value))
     return value
 
+def sync_vision():
+    repos = []
+    #repos = get_json_from_url(MY_REPO_ROOT+'/repos')
+    #repos.extend(get_json_from_url(EQT_REPO_ROOT+'/repos'))
+    repos.extend(get_json_from_url("https://api.github.com/user/repos"))
+    issues = []
+    for repo in repos:
+        if repo['has_issues']:
+            issues.extend(get_json_from_url(repo['url'] + '/issues?state=all&filter=all'))
+
+    issues.extend(get_json_from_url('https://api.github.com/repos/equalitytime/whitewaterwriters' + '/issues?state=all&filter=all'))
+    issues = sorted(issues, key=lambda k: k['title'])
+    deadlines=[]
+    for issue in issues:
+        if '2017' in issue['title']:
+            deadline={}
+            #then it probably has a real deadline.
+            print issue['title']
+            deadline['date']=issue['title'][:10]
+            deadline['action']=issue['title'][11:]
+            deadline['state']=issue['state']
+            deadline['url']=issue['url']
+            deadlines.append(deadline.copy())
+        download_comment_to_file(issue['title'], issue['comments_url'])
 
 
-repos = []
-#repos = get_json_from_url(MY_REPO_ROOT+'/repos')
-#repos.extend(get_json_from_url(EQT_REPO_ROOT+'/repos'))
-repos.extend(get_json_from_url("https://api.github.com/user/repos"))
-issues = []
-for repo in repos:
-    if repo['has_issues']:
-        issues.extend(get_json_from_url(repo['url'] + '/issues?state=all&filter=all'))
-
-issues.extend(get_json_from_url('https://api.github.com/repos/equalitytime/whitewaterwriters' + '/issues?state=all&filter=all'))
-issues = sorted(issues, key=lambda k: k['title'])
-deadlines=[]
-for issue in issues:
-    if '2017' in issue['title']:
-        deadline={}
-        #then it probably has a real deadline.
-        print issue['title']
-        deadline['date']=issue['title'][:10]
-        deadline['action']=issue['title'][11:]
-        deadline['state']=issue['state']
-        deadline['url']=issue['url']
-        deadlines.append(deadline.copy())
-    download_comment_to_file(issue['title'], issue['comments_url'])
+    with open('deadlines.json',"w") as out_file:
+        json.dump(deadlines, out_file)
 
 
-with open('deadlines.json',"w") as out_file:
-    json.dump(deadlines, out_file)
-
-
+if __name__ == "__main__":
+    sync_vision()
