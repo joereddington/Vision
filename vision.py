@@ -44,8 +44,8 @@ def slugify(value):
 
 def sync_vision():
     repos = []
-    #repos = get_json_from_url(MY_REPO_ROOT+'/repos')
-    #repos.extend(get_json_from_url(EQT_REPO_ROOT+'/repos'))
+    repos = get_json_from_url(MY_REPO_ROOT+'/repos')
+    repos.extend(get_json_from_url(EQT_REPO_ROOT+'/repos'))
     repos.extend(get_json_from_url("https://api.github.com/user/repos"))
     issues = []
     for repo in repos:
