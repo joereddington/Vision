@@ -74,10 +74,16 @@ def sync_vision():
 
 
 def process_cards(pri,url):
-   print(("({}) Column url is: {}".format(pri,url)))
    cards= get_json_from_url(url)
    for card in cards: 
-       print(("({}) Column url is: {}".format(pri,card['note'])))
+       payload=""
+       if card['note']:
+            payload="map project:"+ card['note']
+       else:
+            payload="Work on: "+ card['content_url']
+            
+            
+       print(("({}) {}".format(pri,payload)))
    with open('cards.json',"w") as out_file:
         json.dump(cards, out_file)
    
