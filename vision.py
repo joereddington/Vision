@@ -3,11 +3,7 @@
 import urllib.request, urllib.parse, urllib.error
 import json
 from urllib.request import urlopen, Request
-import re
 import os
-
-MY_REPO_ROOT="https://api.github.com/users/joereddington"
-EQT_REPO_ROOT="https://api.github.com/users/equalitytime"
 
 def get_json_from_url(url):
     config = json.loads(open(os.path.dirname(os.path.abspath(__file__))+'/config.json').read())
@@ -18,62 +14,7 @@ def get_json_from_url(url):
     response = urlopen(request)
     return json.loads(response.read())
 
-
-def download_comment_to_file(title, url):
-    data = get_json_from_url(url)
-    with open(os.path.dirname(os.path.abspath(__file__))+'/issues/' + slugify(str(title)) + '.md', 'wb') as \
-        target_file:
-        target_file.write('title: ' + title + '\n')
-        for comment in data:
-            target_file.write(comment['body'].encode('utf-8'))
-            target_file.write('\n')  # Otherwise comments run together
-
-
-# via http://stackoverflow.com/a/295466/170243 and Django
-def slugify(value):
-    """
-    Normalizes string, converts to lowercase, removes non-alpha characters,
-    and converts spaces to hyphens.
-    """
-
-    import unicodedata
-    value = unicodedata.normalize('NFKD', value).encode('ascii',
-            'ignore')
-    value = str(re.sub('[^\w\s-]', '', value).strip().lower())
-    value = str(re.sub('[-\s]+', '-', value))
-    return value
-
-def sync_vision():
-    repos = []
- #   repos = get_json_from_url(MY_REPO_ROOT+'/repos')
-    repos.extend(get_json_from_url(EQT_REPO_ROOT+'/repos'))
- #   repos.extend(get_json_from_url("https://api.github.com/user/repos"))
-    issues = []
-    for repo in repos:
-        if repo['has_issues']:
-            issues.extend(get_json_from_url(repo['url'] + '/issues?state=all&filter=all'))
-
-    issues.extend(get_json_from_url('https://api.github.com/repos/equalitytime/whitewaterwriters' + '/issues?state=all&filter=all'))
-    issues = sorted(issues, key=lambda k: k['title'])
-    deadlines=[]
-    for issue in issues:
-        if '2017' in issue['title']:
-            deadline={}
-            #then it probably has a real deadline.
-            print((issue['title']))
-            deadline['date']=issue['title'][:10]
-            deadline['action']=issue['title'][11:]
-            deadline['state']=issue['state']
-            deadline['url']=issue['url']
-            deadlines.append(deadline.copy())
-        download_comment_to_file(issue['title'], issue['comments_url'])
-
-
-    with open('deadlines.json',"w") as out_file:
-        json.dump(deadlines, out_file)
-
-
-def process_cards(pri,url):
+def process_cards(pri,url, tag=""):
    cards= get_json_from_url(url)
    for card in cards: 
        payload=""
@@ -81,30 +22,20 @@ def process_cards(pri,url):
             payload="map project:"+ card['note']
        else:
             payload="Work on: "+ card['content_url']
-            
-            
-       print(("({}) {}".format(pri,payload)))
-   with open('cards.json',"w") as out_file:
-        json.dump(cards, out_file)
+       print("({}) {} {}".format(pri,payload,tag))
    
 
-if __name__ == "__main__":
-   url = "https://api.github.com/repos/joereddington/projects-public/projects"
-   url = "https://api.github.com/orgs/equalitytime/projects"
+def process_project_board(url,tag=""):
    board= get_json_from_url(url)
-   columns_url= board[1]["columns_url"]
-   with open('temp.json',"w") as out_file:
-        json.dump(board, out_file)
-
+   columns_url= board["columns_url"]
    columns= get_json_from_url(columns_url)
    priorities=['*', 'A', 'B', 'C', 'D','E']
    for x in columns:
-#      print "({}) Column name is: {}".format(priorities.pop(0),x['name'])
-      process_cards(priorities.pop(0),x['cards_url'])
-   with open('columns.json',"w") as out_file:
-        json.dump(columns, out_file)
+      process_cards(priorities.pop(0),x['cards_url'],tag)
+
+if __name__ == "__main__":
+   process_project_board("https://api.github.com/projects/1613733","+EQT")
+   process_project_board("https://api.github.com/projects/1659667","+PersonalProjects")
 
 
 
-
-#    sync_vision()
