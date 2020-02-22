@@ -14,6 +14,7 @@ def get_json_from_url(url):
     token = config['token']
     request = Request(url)
     request.add_header('Authorization', 'token %s' % token)
+    request.add_header('Accept', "application/vnd.github.inertia-preview+json" )
     response = urlopen(request)
     return json.loads(response.read())
 
@@ -44,9 +45,9 @@ def slugify(value):
 
 def sync_vision():
     repos = []
-    repos = get_json_from_url(MY_REPO_ROOT+'/repos')
+ #   repos = get_json_from_url(MY_REPO_ROOT+'/repos')
     repos.extend(get_json_from_url(EQT_REPO_ROOT+'/repos'))
-    repos.extend(get_json_from_url("https://api.github.com/user/repos"))
+ #   repos.extend(get_json_from_url("https://api.github.com/user/repos"))
     issues = []
     for repo in repos:
         if repo['has_issues']:
@@ -73,4 +74,7 @@ def sync_vision():
 
 
 if __name__ == "__main__":
-    sync_vision()
+   url = "https://api.github.com/repos/joereddington/projects-public/projects"
+   print get_json_from_url(url)
+
+#    sync_vision()
