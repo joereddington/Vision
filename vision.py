@@ -1,8 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-import urllib
+import urllib.request, urllib.parse, urllib.error
 import json
-from urllib2 import urlopen, Request
+from urllib.request import urlopen, Request
 import re
 import os
 
@@ -21,7 +21,7 @@ def get_json_from_url(url):
 
 def download_comment_to_file(title, url):
     data = get_json_from_url(url)
-    with open(os.path.dirname(os.path.abspath(__file__))+'/issues/' + slugify(unicode(title)) + '.md', 'wb') as \
+    with open(os.path.dirname(os.path.abspath(__file__))+'/issues/' + slugify(str(title)) + '.md', 'wb') as \
         target_file:
         target_file.write('title: ' + title + '\n')
         for comment in data:
@@ -39,8 +39,8 @@ def slugify(value):
     import unicodedata
     value = unicodedata.normalize('NFKD', value).encode('ascii',
             'ignore')
-    value = unicode(re.sub('[^\w\s-]', '', value).strip().lower())
-    value = unicode(re.sub('[-\s]+', '-', value))
+    value = str(re.sub('[^\w\s-]', '', value).strip().lower())
+    value = str(re.sub('[-\s]+', '-', value))
     return value
 
 def sync_vision():
@@ -60,7 +60,7 @@ def sync_vision():
         if '2017' in issue['title']:
             deadline={}
             #then it probably has a real deadline.
-            print(issue['title'])
+            print((issue['title']))
             deadline['date']=issue['title'][:10]
             deadline['action']=issue['title'][11:]
             deadline['state']=issue['state']
@@ -74,10 +74,10 @@ def sync_vision():
 
 
 def process_cards(pri,url):
-   print("({}) Column url is: {}".format(pri,url))
+   print(("({}) Column url is: {}".format(pri,url)))
    cards= get_json_from_url(url)
    for card in cards: 
-       print("({}) Column url is: {}".format(pri,card['note']))
+       print(("({}) Column url is: {}".format(pri,card['note'])))
    with open('cards.json',"w") as out_file:
         json.dump(cards, out_file)
    
