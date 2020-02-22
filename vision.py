@@ -60,7 +60,7 @@ def sync_vision():
         if '2017' in issue['title']:
             deadline={}
             #then it probably has a real deadline.
-            print issue['title']
+            print(issue['title'])
             deadline['date']=issue['title'][:10]
             deadline['action']=issue['title'][11:]
             deadline['state']=issue['state']
@@ -73,8 +73,32 @@ def sync_vision():
         json.dump(deadlines, out_file)
 
 
+def process_cards(pri,url):
+   print("({}) Column url is: {}".format(pri,url))
+   cards= get_json_from_url(url)
+   for card in cards: 
+       print("({}) Column url is: {}".format(pri,card['note']))
+   with open('cards.json',"w") as out_file:
+        json.dump(cards, out_file)
+   
+
 if __name__ == "__main__":
    url = "https://api.github.com/repos/joereddington/projects-public/projects"
-   print get_json_from_url(url)
+   url = "https://api.github.com/orgs/equalitytime/projects"
+   board= get_json_from_url(url)
+   columns_url= board[1]["columns_url"]
+   with open('temp.json',"w") as out_file:
+        json.dump(board, out_file)
+
+   columns= get_json_from_url(columns_url)
+   priorities=['*', 'A', 'B', 'C', 'D','E']
+   for x in columns:
+#      print "({}) Column name is: {}".format(priorities.pop(0),x['name'])
+      process_cards(priorities.pop(0),x['cards_url'])
+   with open('columns.json',"w") as out_file:
+        json.dump(columns, out_file)
+
+
+
 
 #    sync_vision()
