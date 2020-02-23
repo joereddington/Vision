@@ -23,7 +23,8 @@ def process_cards(pri,url, tag=""):
        if card['note']:
             payload="map project:"+ card['note']
        else:
-            payload="Work on: "+ card['content_url']
+            payload="Work on: "+ card['content_url'].replace("api.github.com/repos","github.com")
+
        print("({}) {} {}".format(pri,payload,tag))
    
 
@@ -31,7 +32,7 @@ def process_project_board(url,tag=""):
    board= get_json_from_url(url)
    columns_url= board["columns_url"]
    columns= get_json_from_url(columns_url)
-   priorities=['*', 'A', 'B', 'C', 'D','E']
+   priorities=['*', 'A', 'B', 'C', 'D','E', "F", "F", "F"]
    for x in columns:
       process_cards(priorities.pop(0),x['cards_url'],tag)
 
