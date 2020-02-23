@@ -12,7 +12,9 @@ def get_json_from_url(url):
     request.add_header('Authorization', 'token %s' % token)
     request.add_header('Accept', "application/vnd.github.inertia-preview+json" )
     response = urlopen(request)
-    return json.loads(response.read())
+    #return json.loads(response.read())
+    #Below needed for pre 3.6 python
+    return json.loads(response.read().decode('utf-8'))
 
 def process_cards(pri,url, tag=""):
    cards= get_json_from_url(url)
@@ -35,7 +37,7 @@ def process_project_board(url,tag=""):
 
 if __name__ == "__main__":
    process_project_board("https://api.github.com/projects/1613733","+EQT")
-   process_project_board("https://api.github.com/projects/1659667","+PersonalProjects")
+   process_project_board("https://api.github.com/projects/3314213","+PersonalProjects")
 
 
 
