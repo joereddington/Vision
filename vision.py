@@ -19,7 +19,6 @@ def get_json_from_url(url):
 def process_cards(pri,url, tag=""):
    cards= get_json_from_url(url)
    for card in cards: 
-       print(card)
        payload=""
        if card['note']:
             payload="map project:"+ card['note']
