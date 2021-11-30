@@ -16,20 +16,40 @@ def get_json_from_url(url):
     #Below needed for pre 3.6 python
     return json.loads(response.read().decode('utf-8'))
 
-def process_cards(pri,url, tag=""):
+def process_cards(pri,url, tag=""): #Called once per column 
    cards= get_json_from_url(url)
    for card in cards: 
+       #for x,y in card.items():
+       #     print("{}:{}".format(x,y,))
        payload=""
        if card['note']:
             payload="map project:"+ card['note']
        else:
+            if is_issue_private(card['content_url']):
                 payload="Work on: "+ card['content_url'].replace("api.github.com/repos","github.com")
+            else:
+                title=get_issue_title(card['content_url'])
+                payload="Work on: "+title+" "+ card['content_url'].replace("api.github.com/repos","github.com")
 
        if "F" not in pri: 
            print("({}) {} {}".format(pri,payload,tag))
-   
 
-def is_repo_private(repo_url):
+
+def get_issue_title(issue_url): 
+   issue_json= get_json_from_url(issue_url)
+#   for x,y in issue_json.items():
+#        print("{}:{}".format(x,y,))
+   return issue_json['title']
+    
+
+def is_issue_private(issue_url): 
+    if "Private" in issue_url:
+        return True
+    if "Home" in issue_url:
+        return True
+    return False
+
+def is_repo_private_old(repo_url):
    content=get_json_from_url(repo_url)
    return content['private']
 
