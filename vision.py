@@ -5,6 +5,8 @@ import json
 from urllib.request import urlopen, Request
 import os
 
+verbose=False
+
 def get_json_from_url(url):
     config = json.loads(open(os.path.dirname(os.path.abspath(__file__))+'/config.json').read())
     token = config['token']
@@ -27,6 +29,11 @@ def process_cards(pri,url, tag=""): #Called once per column
        else:
             if is_issue_private(card['content_url']):
                 payload="Work on: "+ card['content_url'].replace("api.github.com/repos","github.com")
+                if verbose:
+                    print(card)
+                    print(payload)
+                    print(get_issue_title(card['content_url']))
+            
             else:
                 title=get_issue_title(card['content_url'])
                 payload="Work on: "+title+" "+ card['content_url'].replace("api.github.com/repos","github.com")
