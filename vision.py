@@ -8,15 +8,22 @@ import os
 verbose=False
 
 def get_json_from_url(url):
-    config = json.loads(open(os.path.dirname(os.path.abspath(__file__))+'/config.json').read())
-    token = config['token']
-    request = Request(url)
-    request.add_header('Authorization', 'token %s' % token)
-    request.add_header('Accept', "application/vnd.github.inertia-preview+json" )
-    response = urlopen(request)
-    #return json.loads(response.read())
-    #Below needed for pre 3.6 python
-    return json.loads(response.read().decode('utf-8'))
+    try:
+        config = json.loads(open(os.path.dirname(os.path.abspath(__file__))+'/config.json').read())
+        token = config['token']
+        request = Request(url)
+        request.add_header('Authorization', 'token %s' % token)
+        request.add_header('Accept', "application/vnd.github.inertia-preview+json" )
+        response = urlopen(request)
+        #return json.loads(response.read())
+        #Below needed for pre 3.6 python
+        return json.loads(response.read().decode('utf-8'))
+#    except HTTPError as e:
+#        print('HTTP Error:', e.code, e.reason)
+#    except URLError as e:
+#        print('URL Error:', e.reason)
+    except Exception as e:
+        print('General Error:', str(e))
 
 def process_cards(pri,url, tag=""): #Called once per column 
    cards= get_json_from_url(url)
@@ -68,9 +75,6 @@ def process_project_board(url,tag=""):
    for x in columns:
       process_cards(priorities.pop(0),x['cards_url'],tag)
 
-def for_tests():
-   print(is_repo_private("https://api.github.com/repos/eQualityTime/Home"))
-   print(is_repo_private("https://api.github.com/repos/eQualityTime/Public"))
 
 
 if __name__ == "__main__":
